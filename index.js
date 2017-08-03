@@ -5,6 +5,13 @@ var http = require('http');
 var app = express();
 var fs = require('fs');
 var serveIndex = require('serve-index')
+const filesRouter = require('angular-filemanager-nodejs-bridge').router;
+const pathresolver = require('angular-filemanager-nodejs-bridge').pathresolver;
+ 
+pathresolver.baseDir = function(req) {
+  return '/app';
+};
+
 var port = process.env.PORT || 9111;
 
 var client = new webtorrent();
@@ -21,6 +28,10 @@ app.use(express.static(path.join(__dirname, 'app')));
 
 app.use('/download', serveIndex('app', {'icons': true}))
 app.use('/download', express.static(path.join(__dirname, 'app')));
+
+const routes = express.Router();
+ 
+routes.use('/files', filesRouter);
 
 var getLargestFile = function (torrent) {
     var file;
