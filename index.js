@@ -3,7 +3,7 @@ var webtorrent = require('webtorrent');
 var path = require('path');
 var http = require('http');
 var app = express();
-
+var fs = require('fs');
 var port = process.env.PORT || 9111;
 
 var client = new webtorrent();
@@ -87,6 +87,19 @@ app.get('/api/getTorrentDetails/:infoHash', function(req, res) {
         res.status(500).send('Error: ' + err.toString());
     }
 });
+
+app.get('/api/getDirectoryListing', function(req, res) {
+    var path = './public';
+    fs.readdir(path, function(err, items) {
+        var output = '';
+        for (var i=0; i<items.length; i++) {
+            var file = path + '/' + items[i];
+            //console.log("Start: " + file);
+            output = output + '<br>' + file;
+        }
+        res.status(200).send('Listing: ' + output);
+    });
+})
 
 
 app.get('/stream/:infoHash.mp4', function(req, res, next) {
