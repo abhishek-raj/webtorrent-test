@@ -16,6 +16,27 @@
                 $('.video').show();
             });
         });
+        $('.add').click(function() {
+            window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
+            $.get(api + 'api/addTorrent/' + infoHash, function(data) {
+                $('.output').html(data);
+            });
+        });
+
+        $('.detail').click(function() {
+            window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
+            $.get(api + 'api/getTorrentDetails/' + infoHash, function(data) {
+                $('.output').html(data);
+            });
+        });
+
+        $('.delete').click(function() {
+            window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
+            $.get(api + 'api/delete/' + infoHash, function(data) {
+                $('.output').html(data);
+            });
+        });
+
         $('.stop').click(function() {
             $.get(api + 'api/delete/' + infoHash, function(data) {
                 $('video').attr('src', '');
@@ -40,7 +61,11 @@
             <p>Sample torrent: magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&amp;dn=sintel.mp4 (Sintel Open Source Movie, H.264 MP4, ~120 MiB). </p>
             <input type="text" style="width:350px" name="torrent" placeholder="Enter torrent URL. " />
             <button class="stream">Stream!</button>
+            <button class="add">Add!</button>
+            <button class="detail">Details</button>
+            <button class="delete">Delete!</button>
         </div>
+        <div class="output"></div>
     </div>
 </body>
 </html>
