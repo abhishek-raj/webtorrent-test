@@ -4,7 +4,7 @@ var path = require('path');
 var http = require('http');
 var app = express();
 var fs = require('fs');
-var serveIndex = require('serve-index')
+var serveIndex = require('serve-index');
 
 var port = process.env.PORT || 9111;
 
