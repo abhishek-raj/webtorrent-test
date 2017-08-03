@@ -19,6 +19,7 @@
   "homepage": "https://github.com/abhishek-raj/webtorrent-experiment#readme",
   "dependencies": {
     "express": "^4.15.3",
+    "path": "^0.12.7",
     "webtorrent": "^0.98.19"
   }
 }
