@@ -6,7 +6,7 @@
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script>
     $(function() {
-        var api = 'http://localhost:9111/';
+        var api = 'http://rajtorrent.azurewebsites.net/';
         $('.stream').click(function() {
             window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
             $.get(api + 'api/add/' + infoHash, function(data) {
