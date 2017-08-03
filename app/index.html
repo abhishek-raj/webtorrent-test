@@ -37,12 +37,6 @@
             });
         });
 
-        $('.files').click(function() {
-            $.get(api + 'api/getDirectoryListing/', function(data) {
-                $('.output').html(data);
-            });
-        });
-
         $('.stop').click(function() {
             $.get(api + 'api/delete/' + infoHash, function(data) {
                 $('video').attr('src', '');
@@ -70,7 +64,6 @@
             <button class="add">Add!</button>
             <button class="detail">Details</button>
             <button class="delete">Delete!</button>
-            <button class="files">Files</button>
         </div>
         <div class="output"></div>
     </div>

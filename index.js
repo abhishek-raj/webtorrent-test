@@ -18,6 +18,8 @@ app.use(function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'app')));
 
+app.use('/download', serveIndex('app', {'icons': true}))
+
 var getLargestFile = function (torrent) {
     var file;
     for(i = 0; i < torrent.files.length; i++) {
@@ -87,20 +89,6 @@ app.get('/api/getTorrentDetails/:infoHash', function(req, res) {
         res.status(500).send('Error: ' + err.toString());
     }
 });
-
-app.get('/api/getDirectoryListing', function(req, res) {
-    var path = '.\\public\\';
-    fs.readdir(path, function(err, items) {
-        var output = '';
-        for (var i=0; i<items.length; i++) {
-            var file = path + '/' + items[i];
-            //console.log("Start: " + file);
-            output = output + '<br>' + file;
-        }
-        res.status(200).send('Listing: ' + output);
-    });
-})
-
 
 app.get('/stream/:infoHash.mp4', function(req, res, next) {
     if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
