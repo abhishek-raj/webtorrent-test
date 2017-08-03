@@ -89,7 +89,7 @@ app.get('/api/getTorrentDetails/:infoHash', function(req, res) {
 });
 
 app.get('/api/getDirectoryListing', function(req, res) {
-    var path = './public';
+    var path = './public/';
     fs.readdir(path, function(err, items) {
         var output = '';
         for (var i=0; i<items.length; i++) {
