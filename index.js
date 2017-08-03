@@ -20,6 +20,7 @@ app.use(function(req, res, next) {
 app.use(express.static(path.join(__dirname, 'app')));
 
 app.use('/download', serveIndex('app', {'icons': true}))
+app.use('/download', express.static(path.join(__dirname, 'app')));
 
 var getLargestFile = function (torrent) {
     var file;
