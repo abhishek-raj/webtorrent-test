@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BrowserTorrent</title>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+    $(function() {
+        var api = 'http://localhost:9111/';
+        $('.stream').click(function() {
+            window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
+            $.get(api + 'api/add/' + infoHash, function(data) {
+                var video = api + 'stream/' + infoHash + '.mp4';
+                $('video').attr('src', video);
+                $('.input').hide();
+                $('.video').show();
+            });
+        });
+        $('.stop').click(function() {
+            $.get(api + 'api/delete/' + infoHash, function(data) {
+                $('video').attr('src', '');
+                $('input').val('');
+                window.infoHash = '';
+                $('.input').show();
+                $('.video').hide();
+            });
+        });
+    });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>BrowserTorrent</h1>
+        <div class="video" style="display:none">
+            <video width="640" height="360" autoplay preload controls type="video/mp4" src="" style="background:black"></video>
+            <br>
+            <button class="stop">Stop</button>
+        </div>
+        <div class="input">
+            <p>Sample torrent: magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&amp;dn=sintel.mp4 (Sintel Open Source Movie, H.264 MP4, ~120 MiB). </p>
+            <input type="text" style="width:350px" name="torrent" placeholder="Enter torrent URL. " />
+            <button class="stream">Stream!</button>
+        </div>
+    </div>
+</body>
+</html>
