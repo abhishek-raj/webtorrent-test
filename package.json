@@ -1,11 +1,24 @@
 {
-    "name": "BrowserTorrent",
-    "version": "1.0.0",
-    "scripts": {
-            "start": "node ./index.js"
-    },
-    "dependencies": {
-        "express": "~4.13.1",
-        "webtorrent": "~0.62.3"
-    }
+  "name": "webtorrent-experiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhishek-raj/webtorrent-experiment.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhishek-raj/webtorrent-experiment/issues"
+  },
+  "homepage": "https://github.com/abhishek-raj/webtorrent-experiment#readme",
+  "dependencies": {
+    "express": "^4.15.3",
+    "webtorrent": "^0.98.19"
+  }
 }
