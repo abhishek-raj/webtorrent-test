@@ -36,6 +36,7 @@ app.get('/api/add/:infoHash', function(req, res) {
     if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
         res.status(500).send('Missing infoHash parameter!'); return;
     }
+    console.log("called");
     var torrent = buildMagnetURI(req.params.infoHash);
     try {
         client.add(torrent, function (torrent) {
@@ -46,6 +47,7 @@ app.get('/api/add/:infoHash', function(req, res) {
                     torrent.discovery.stop();
                 }
             });
+            console.log("Reached");
             res.status(200).send('Added torrent!');
         });
     } catch (err) {
