@@ -6,11 +6,11 @@
     <script src="jquery.min.js"></script>
     <script>
     $(function() {
-        var api = 'http://rajtorrent.azurewebsites.net/';
+        var api = window.location.hostname;
         $('.stream').click(function() {
             window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
-            $.get(api + 'api/add/' + infoHash, function(data) {
-                var video = api + 'stream/' + infoHash + '.mp4';
+            $.get('api/add/' + infoHash, function(data) {
+                var video = 'stream/' + infoHash + '.mp4';
                 $('video').attr('src', video);
                 $('.input').hide();
                 $('.video').show();
@@ -18,27 +18,27 @@
         });
         $('.add').click(function() {
             window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
-            $.get(api + 'api/addTorrent/' + infoHash, function(data) {
+            $.get('api/addTorrent/' + infoHash, function(data) {
                 $('.output').html(data);
             });
         });
 
         $('.detail').click(function() {
             window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
-            $.get(api + 'api/getTorrentDetails/' + infoHash, function(data) {
+            $.get('api/getTorrentDetails/' + infoHash, function(data) {
                 $('.output').html(data);
             });
         });
 
         $('.delete').click(function() {
             window.infoHash = $('input').val().split('btih:')[1].split('&')[0];
-            $.get(api + 'api/delete/' + infoHash, function(data) {
+            $.get('api/delete/' + infoHash, function(data) {
                 $('.output').html(data);
             });
         });
 
         $('.stop').click(function() {
-            $.get(api + 'api/delete/' + infoHash, function(data) {
+            $.get('api/delete/' + infoHash, function(data) {
                 $('video').attr('src', '');
                 $('input').val('');
                 window.infoHash = '';
