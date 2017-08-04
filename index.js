@@ -20,8 +20,8 @@ app.use(function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'app')));
 
-app.use('/download', serveIndex('app', {'icons': true}))
-app.use('/download', express.static(path.join(__dirname, 'app')));
+app.use('/downloads', serveIndex('app', {'icons': true}))
+app.use('/downloads', express.static(path.join(__dirname, 'app')));
 
 var getLargestFile = function (torrent) {
     var file;
@@ -31,6 +31,27 @@ var getLargestFile = function (torrent) {
         }
     }
     return file;
+};
+
+var rmDir = function(dirPath, removeSelf) {
+    if (removeSelf === undefined)
+        removeSelf = true;
+    try { 
+        var files = fs.readdirSync(dirPath); 
+    }
+    catch(e) { 
+        return; 
+    }
+    if (files.length > 0)
+    for (var i = 0; i < files.length; i++) {
+        var filePath = path.join(dirPath, files[i]);
+        if (fs.statSync(filePath).isFile())
+            fs.unlinkSync(filePath);
+        else
+            rmDir(filePath);
+    }
+    if (removeSelf)
+        fs.rmdirSync(dirPath);
 };
 
 var buildMagnetURI = function(infoHash) {
@@ -64,7 +85,7 @@ app.get('/api/addTorrent/:infoHash', function(req, res) {
     }
     var torrent = buildMagnetURI(req.params.infoHash);
 
-    var downloadPath = './app/';
+    var downloadPath = './app/torrents/';
     if(!(typeof req.params.downloadPath == 'undefined' || req.params.downloadPath == '')) {
         downloadPath = downloadPath + req.params.downloadPath;
     } else {
@@ -75,6 +96,26 @@ app.get('/api/addTorrent/:infoHash', function(req, res) {
             
             res.status(200).send('Added torrent!');
         });
+    } catch (err) {
+        res.status(500).send('Error: ' + err.toString());
+    }
+});
+
+app.get('/api/deleteFile/*', function(req, res) {
+    if(typeof req.params[0] == 'undefined' || req.params[0] == '') {
+        res.status(500).send('Missing directory parameter!'); return;
+    }
+
+    if(req.params[0].indexOf('..') != -1) {
+        res.status(500).send('Cannot use .. in directory parameter!'); return;
+    }
+
+    var deletePath = './app/torrents/';
+    deletePath = path.join(deletePath, req.params[0]);
+
+    try {
+        rmDir(deletePath);
+        res.status(200).send('Deleted directory: ' + deletePath);
     } catch (err) {
         res.status(500).send('Error: ' + err.toString());
     }
