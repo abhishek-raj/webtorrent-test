@@ -121,7 +121,10 @@ app.get('/api/deleteFile/*', function(req, res) {
     try {
 
         var torrent1 = buildMagnetURI(req.params[0]);
-        var torrent = client.remove(torrent1);
+        if (client.get(torrent1)) {
+            client.remove(torrent1);
+            console.log("removed torrent before deleting");
+        }
         rmDir(deletePath);
         res.status(200).send('Deleted directory: ' + deletePath);
     } catch (err) {
