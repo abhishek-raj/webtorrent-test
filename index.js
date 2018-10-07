@@ -20,12 +20,14 @@ app.use(function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'app')));
 
-app.use('/downloads', serveIndex('app', {'icons': true}))
+app.use('/downloads', serveIndex('app', {
+    'icons': true
+}))
 app.use('/downloads', express.static(path.join(__dirname, 'app')));
 
-var getLargestFile = function (torrent) {
+var getLargestFile = function(torrent) {
     var file;
-    for(i = 0; i < torrent.files.length; i++) {
+    for (i = 0; i < torrent.files.length; i++) {
         if (!file || file.length < torrent.files[i].length) {
             file = torrent.files[i];
         }
@@ -36,20 +38,19 @@ var getLargestFile = function (torrent) {
 var rmDir = function(dirPath, removeSelf) {
     if (removeSelf === undefined)
         removeSelf = true;
-    try { 
-        var files = fs.readdirSync(dirPath); 
-    }
-    catch(e) { 
-        return; 
+    try {
+        var files = fs.readdirSync(dirPath);
+    } catch (e) {
+        return;
     }
     if (files.length > 0)
-    for (var i = 0; i < files.length; i++) {
-        var filePath = path.join(dirPath, files[i]);
-        if (fs.statSync(filePath).isFile())
-            fs.unlinkSync(filePath);
-        else
-            rmDir(filePath);
-    }
+        for (var i = 0; i < files.length; i++) {
+            var filePath = path.join(dirPath, files[i]);
+            if (fs.statSync(filePath).isFile())
+                fs.unlinkSync(filePath);
+            else
+                rmDir(filePath);
+        }
     if (removeSelf)
         fs.rmdirSync(dirPath);
 };
@@ -59,15 +60,16 @@ var buildMagnetURI = function(infoHash) {
 };
 
 app.get('/api/add/:infoHash', function(req, res) {
-    if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
-        res.status(500).send('Missing infoHash parameter!'); return;
+    if (typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
+        res.status(500).send('Missing infoHash parameter!');
+        return;
     }
     var torrent = buildMagnetURI(req.params.infoHash);
     try {
-        client.add(torrent, function (torrent) {
+        client.add(torrent, function(torrent) {
             var file = getLargestFile(torrent);
             torrent.swarm.on('upload', function() {
-                if(torrent.length == torrent.downloaded) {
+                if (torrent.length == torrent.downloaded) {
                     torrent.swarm.destroy();
                     torrent.discovery.stop();
                 }
@@ -80,20 +82,21 @@ app.get('/api/add/:infoHash', function(req, res) {
 });
 
 app.get('/api/addTorrent/:infoHash', function(req, res) {
-    if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
-        res.status(500).send('Missing infoHash parameter!'); return;
+    if (typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
+        res.status(500).send('Missing infoHash parameter!');
+        return;
     }
     var torrent = buildMagnetURI(req.params.infoHash);
-
     var downloadPath = './app/torrents/';
-    if(!(typeof req.params.downloadPath == 'undefined' || req.params.downloadPath == '')) {
+    if (!(typeof req.params.downloadPath == 'undefined' || req.params.downloadPath == '')) {
         downloadPath = downloadPath + req.params.downloadPath;
     } else {
         downloadPath = downloadPath + req.params.infoHash;
     }
     try {
-        client.add(torrent, {path: downloadPath}, function (torrent) {
-            
+        client.add(torrent, {
+            path: downloadPath
+        }, function(torrent) {
             res.status(200).send('Added torrent!');
         });
     } catch (err) {
@@ -102,18 +105,26 @@ app.get('/api/addTorrent/:infoHash', function(req, res) {
 });
 
 app.get('/api/deleteFile/*', function(req, res) {
-    if(typeof req.params[0] == 'undefined' || req.params[0] == '') {
-        res.status(500).send('Missing directory parameter!'); return;
+    if (typeof req.params[0] == 'undefined' || req.params[0] == '') {
+        res.status(500).send('Missing directory parameter!');
+        return;
     }
 
-    if(req.params[0].indexOf('..') != -1) {
-        res.status(500).send('Cannot use .. in directory parameter!'); return;
+    if (req.params[0].indexOf('..') != -1) {
+        res.status(500).send('Cannot use .. in directory parameter!');
+        return;
     }
 
     var deletePath = './app/torrents/';
     deletePath = path.join(deletePath, req.params[0]);
 
     try {
+
+        var torrent1 = buildMagnetURI(req.params[0]);
+        if (client.get(torrent1)) {
+            client.remove(torrent1);
+            console.log("removed torrent before deleting");
+        }
         rmDir(deletePath);
         res.status(200).send('Deleted directory: ' + deletePath);
     } catch (err) {
@@ -122,21 +133,23 @@ app.get('/api/deleteFile/*', function(req, res) {
 });
 
 app.get('/api/getTorrentDetails/:infoHash', function(req, res) {
-    if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
-        res.status(500).send('Missing infoHash parameter!'); return;
+    if (typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
+        res.status(500).send('Missing infoHash parameter!');
+        return;
     }
     var torrent = buildMagnetURI(req.params.infoHash);
     try {
         var torrent = client.get(torrent);
-        res.status(200).send('Progress: ' + torrent.progress + 'Time Remain: '+ torrent.timeRemaining);
+        res.status(200).send('Progress: ' + torrent.progress + 'Time Remain: ' + torrent.timeRemaining);
     } catch (err) {
         res.status(500).send('Error: ' + err.toString());
     }
 });
 
 app.get('/stream/:infoHash.mp4', function(req, res, next) {
-    if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
-        res.status(500).send('Missing infoHash parameter!'); return;
+    if (typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
+        res.status(500).send('Missing infoHash parameter!');
+        return;
     }
     var torrent = buildMagnetURI(req.params.infoHash);
     try {
@@ -144,7 +157,7 @@ app.get('/stream/:infoHash.mp4', function(req, res, next) {
         var file = getLargestFile(torrent);
         var total = file.length;
 
-        if(typeof req.headers.range != 'undefined') {
+        if (typeof req.headers.range != 'undefined') {
             var range = req.headers.range;
             var parts = range.replace(/bytes=/, "").split("-");
             var partialstart = parts[0];
@@ -153,11 +166,20 @@ app.get('/stream/:infoHash.mp4', function(req, res, next) {
             var end = partialend ? parseInt(partialend, 10) : total - 1;
             var chunksize = (end - start) + 1;
         } else {
-            var start = 0; var end = total;
+            var start = 0;
+            var end = total;
         }
 
-        var stream = file.createReadStream({start: start, end: end});
-        res.writeHead(206, { 'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 'Accept-Ranges': 'bytes', 'Content-Length': chunksize, 'Content-Type': 'video/mp4' });
+        var stream = file.createReadStream({
+            start: start,
+            end: end
+        });
+        res.writeHead(206, {
+            'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4'
+        });
         stream.pipe(res);
     } catch (err) {
         res.status(500).send('Error: ' + err.toString());
@@ -166,8 +188,9 @@ app.get('/stream/:infoHash.mp4', function(req, res, next) {
 
 
 app.get('/api/delete/:infoHash', function(req, res, next) {
-    if(typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
-        res.status(500).send('Missing infoHash parameter!'); return;
+    if (typeof req.params.infoHash == 'undefined' || req.params.infoHash == '') {
+        res.status(500).send('Missing infoHash parameter!');
+        return;
     }
     var torrent = buildMagnetURI(req.params.infoHash);
     try {
